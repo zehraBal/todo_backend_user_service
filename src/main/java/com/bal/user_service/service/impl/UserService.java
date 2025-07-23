@@ -1,5 +1,6 @@
 package com.bal.user_service.service.impl;
 
+import com.bal.user_service.dto.RegisterRequestDTO;
 import com.bal.user_service.dto.UserRequestDTO;
 import com.bal.user_service.dto.UserResponseDTO;
 import com.bal.user_service.model.User;
@@ -76,5 +77,26 @@ public class UserService implements IUserService{
         modelMapper.map(userRequest,existingUser);
         User updatedUser=userRepository.save(existingUser);
         return userToResponseDto(updatedUser);
+    }
+
+    @Override
+    public UserResponseDTO saveUser(RegisterRequestDTO dto) {
+        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new RuntimeException("User already exists with username: " + dto.getUsername());
+        }
+
+        User user = User.builder()
+                .username(dto.getUsername())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .roles(dto.getRoles())
+                .build();
+
+        User savedUser = userRepository.save(user);
+
+        return userToResponseDto(savedUser);
+    }
+    public Optional<User> findByUsername(String username){
+        return userRepository.findByUsername(username);
     }
 }
