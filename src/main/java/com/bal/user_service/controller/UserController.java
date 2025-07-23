@@ -1,7 +1,9 @@
 package com.bal.user_service.controller;
 
+import com.bal.user_service.dto.RegisterRequestDTO;
 import com.bal.user_service.dto.UserRequestDTO;
 import com.bal.user_service.dto.UserResponseDTO;
+import com.bal.user_service.model.User;
 import com.bal.user_service.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,19 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getByUsername(@PathVariable String username){
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
+    @GetMapping("/username/{username}/password-hash")
+    public ResponseEntity<String> getUserPasswordHash(@PathVariable String username) {
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("user not found"));
+
+        return ResponseEntity.ok(user.getPassword());
+    }
+
+    @PostMapping("/save")
+    ResponseEntity<UserResponseDTO> saveUser(@RequestBody RegisterRequestDTO userDTO){
+        return ResponseEntity.ok(userService.saveUser(userDTO));
+    }
+
     @PutMapping("/{username}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable String username,
